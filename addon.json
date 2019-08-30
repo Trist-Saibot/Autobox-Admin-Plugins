@@ -1,0 +1,12 @@
+{
+    "title"       :    "AAP (Autobox Admin Plugins)",
+    "type"        :    "ServerContent",
+    "info"        :    "A set of admin mod plugins for AAT",
+    "tags"        :    [ "fun"],
+    "ignore"      :
+    [
+        "*.psd",
+        "*.vcproj",
+        "*.svn*"
+    ]
+}
