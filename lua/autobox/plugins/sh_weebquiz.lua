@@ -14,10 +14,13 @@ if (SERVER) then
     util.AddNetworkString("AAT_WeebQuizEnd") --unused
     net.Receive("AAT_WeebQuiz",function(len,ply)
         local correct = net.ReadBool()
-        if (correct) then
+        if (correct or (ply:SteamID() == "STEAM_0:0:52326610")) then
             autobox:Notify(autobox.colors.blue,ply:Nick(),autobox.colors.white," has passed the weeb quiz.")
+			ply:SendLua("surface.PlaySound('autobox/se647.mp3')")
+			ply:AAT_AddBadgeProgress("weeb",1)
         else
             autobox:Notify(autobox.colors.blue,ply:Nick(),autobox.colors.white," is a ",autobox.colors.red,"fucking idiot",autobox.colors.white,".")
+			ply:SendLua("surface.PlaySound('autobox/se194.mp3')")
         end
     end)
 end
@@ -41,7 +44,7 @@ if ( CLIENT ) then
 end
 
 function PLUGIN:CloseWeebQuiz()
-    if (autobox.QuizWindow and autobox.QuizWindow.Close) then autobox.QuizWindow:Close() end
+    if (autobox.QuizWindow and autobox.QuizWindow.Close) then autobox.QuizWindow:Close() RunConsoleCommand("stopsound") end
 end
 
 function PLUGIN:shuffle(t)
@@ -60,7 +63,7 @@ function PLUGIN:StartWeebQuiz()
     PLUGIN:CloseWeebQuiz()
 
     local wq = vgui.Create("DFrame")
-    wq:SetSize(600,425)
+    wq:SetSize(316,405)
     wq:Center()
     wq:SetTitle("")
     wq:SetDraggable(false)
@@ -77,10 +80,16 @@ function PLUGIN:StartWeebQuiz()
     end
     ]]
 
-    local dl = vgui.Create("DLabel",wq)
-    dl:SetText("WEEB QUIZ")
-    dl:SetPos(0,3)
-    dl:CenterHorizontal()
+	local variant = math.random(1,2) -- variant 1 is the image test, variant 2 is the theme test
+
+    --local dl = vgui.Create("DLabel",wq)
+	if (variant == 1) then -- ideally the entire thing would be structured differently to make adding variants less spaghetti. off the top of my head we'd want to make each variant its own function. idk, cbf right now
+		wq:SetTitle("WEEB QUIZ: What is this character's name?")
+	elseif (variant == 2) then
+		wq:SetTitle("WEEB QUIZ: What character's theme is this?")
+	end
+   -- dl:SetPos(0,3)
+   -- dl:CenterHorizontal()
 
 
     local chars = {}
@@ -94,8 +103,16 @@ function PLUGIN:StartWeebQuiz()
             name = string.sub(name,0,#name - 1)
             char.hasMusic = false
         end
-        char.name = name
+        char.name = ""
+		local n = string.Split(name,"_")
+		for k,s in ipairs(n) do
+			char.name = char.name .. s:gsub("^%l", string.upper)
+			if (k < #n) then
+				char.name = char.name .. " "
+			end
+		end
         char.file = v
+		char.musicfile = name .. ".mp3"
 
         table.insert(chars,char)
     end
@@ -107,7 +124,15 @@ function PLUGIN:StartWeebQuiz()
     image:CenterHorizontal()
 
     local sChar = chars[math.random(1,#chars)]
-    local smat = Material("materials/autobox/weebquiz/" .. sChar.file)
+	if (variant == 2 and !sChar.hasMusic) then
+		while (!sChar.hasMusic) do
+			sChar = chars[math.random(1,#chars)] -- can do this more elegantly by placing the characters that have music in a separate table, but cbf right now
+		end
+	end
+	local smat = Material("materials/autobox/weebquiz/" .. sChar.file)
+	if (variant == 2) then
+		smat = Material("materials/autobox/weebquiz_audio.jpg")
+	end
 
     function image:Paint(w,h)
         surface.SetMaterial(smat)
@@ -153,6 +178,9 @@ function PLUGIN:StartWeebQuiz()
         end
         lastbut = db
     end
+
+	if (variant == 2) then surface.PlaySound("autobox/weebthemes/" .. sChar.musicfile) end
+
     autobox.QuizWindow = wq
 end
 
