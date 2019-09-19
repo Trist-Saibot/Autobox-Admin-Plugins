@@ -18,7 +18,7 @@ if (SERVER) then
         if (correct or (ply:SteamID() == "STEAM_0:0:52326610")) then
             if (ply:SteamID() == "STEAM_0:1:33216124" and math.random(1,2) % 2 == 0) then
                 autobox:Notify(autobox.colors.blue,ply:Nick(),autobox.colors.white," has ", autobox.colors.red, "passed", autobox.colors.white, " the weeb quiz, however fate decided that she's a ",autobox.colors.red,"fucking idiot",autobox.colors.white," and therefore fails.")
-                ply:SendLua("surface.PlaySound('autobox/se194.mp3')")
+                ply:SendLua("surface.PlaySound('autobox/se647.mp3')")
             else
                 autobox:Notify(autobox.colors.blue,ply:Nick(),autobox.colors.white," has ", autobox.colors.red, "passed", autobox.colors.white, " the weeb quiz.")
                 ply:SendLua("surface.PlaySound('autobox/se647.mp3')")
