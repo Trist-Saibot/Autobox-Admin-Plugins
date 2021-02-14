@@ -2,6 +2,8 @@
 -- Weeb Quiz
 -----
 
+
+
 local PLUGIN = {}
 PLUGIN.title = "Weeb Quiz"
 PLUGIN.author = "Trist"
@@ -12,6 +14,7 @@ PLUGIN.command = "wquiz"
 if (SERVER) then
     util.AddNetworkString("AAT_WeebQuiz")
     util.AddNetworkString("AAT_WeebQuizPussy")
+    AddCSLuaFile("autobox/id3.lua")
     net.Receive("AAT_WeebQuiz",function(len,ply)
         local correct = net.ReadBool()
         autobox.silentNotify = ply.silentQuiz or false
@@ -87,7 +90,7 @@ function PLUGIN:StartWeebQuiz()
     PLUGIN:CloseWeebQuiz()
 
     local wq = vgui.Create("DFrame")
-    wq:SetSize(316,405)
+    wq:SetSize(316,430)
     wq:Center()
     wq:SetTitle("")
     wq:SetDraggable(false)
@@ -182,7 +185,7 @@ function PLUGIN:StartWeebQuiz()
         db:SizeToContents()
         db:CenterHorizontal()
         if (k == 1) then
-            db:MoveBelow(image,5)
+            db:MoveBelow(image,10)
         else
             db:MoveBelow(lastbut,5)
         end
@@ -196,7 +199,13 @@ function PLUGIN:StartWeebQuiz()
         lastbut = db
     end
 
-    if (variant == 2) then surface.PlaySound("autobox/weebthemes/" .. sChar.musicfile) end
+    if (variant == 2) then
+		surface.PlaySound("autobox/weebthemes/" .. sChar.musicfile)
+		local metadata = include("autobox/id3.lua").readtags("sound/autobox/weebthemes/" .. sChar.musicfile)
+		local musiclabel = vgui.Create("DLabel",wq)
+		musiclabel:Dock( BOTTOM )
+		musiclabel:SetText("♫ " .. metadata.title)
+	end
 
     timer.Create("WeebQuizTimeout",30,1,function()
         net.Start("AAT_WeebQuiz")

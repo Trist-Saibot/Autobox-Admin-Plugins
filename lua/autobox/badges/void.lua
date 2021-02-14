@@ -1,0 +1,1 @@
+autobox.badge:RegisterBadge("void","Void Survivor","You survived the VOID",1,"materials/icon16/contrast.png")

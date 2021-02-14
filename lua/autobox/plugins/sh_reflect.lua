@@ -35,14 +35,18 @@ end
 
 function PLUGIN:EntityTakeDamage(ent,dmg)
     if (ent:IsPlayer() and ent:GetNWBool( "AAT_Shielded", false )) then
-        if (IsEntity(dmg:GetInflictor())) then
-            local inf = dmg:GetInflictor()
+        local inf = dmg:GetInflictor()
+        if (IsEntity(inf) and inf:IsValid()) then
             ent:EmitSound(sounds[math.random(1,#sounds)],75,math.random(70,130))
-            ent:SetNWVector("tri_shield",ent:GetPos() - inf:GetPos()) --sends the direction vector of the damage
-            ent:SetNWInt("tri_sh_hit",CurTime())
+
+            local dir = ent:GetPos() - inf:GetPos() --sends the direction vector of the damage
+            if (dmg:GetDamageType() != DMG_FALL) then
+                ent:SetNWVector("tri_shield",dir)
+                ent:SetNWInt("tri_sh_hit",CurTime())
+            end
             local attacker = dmg:GetAttacker()
-            if (dmg:GetAttacker():IsPlayer() and !attacker:GetNWBool( "AAT_Shielded", false )) then
-            attacker:TakeDamageInfo(dmg)
+            if (!attacker:GetNWBool( "AAT_Shielded", false )) then
+                attacker:TakeDamageInfo(dmg)
             end
         end
         return true
